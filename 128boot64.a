@@ -38,8 +38,8 @@ fill_screen
 ; data starts here
 
 screen_contents
-  !byte $0D,$4C,$4F,$41,$44,$22,$42,$4F ;LOAD"BO
-  !byte $4F,$54,$36,$34,$22,$2C,$38,$0D ;OT64",8 <cr>
+  !byte $0D,$4C,$4F,$41,$44,$22,$42,$4F ;<cr>LOAD"BO
+  !byte $4F,$54,$36,$34,$22,$2C,$38,$0D ;OT64",8<cr>
   !byte $0D,$0D,$0D,$0D,$52,$55,$4E,$91 ;<cr><cr><cr><cr>RUN<up>
   !byte $91,$91,$91,$91,$91,$91,$00     ;<up><up><up><up><up><up>
 
