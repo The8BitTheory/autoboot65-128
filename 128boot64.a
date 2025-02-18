@@ -1,0 +1,45 @@
+!to "128boot64.bin",cbm
+* = $1c01
+
+   ora #$80
+
+!byte $5E,$FE,$C3,$C2,$CD,$38,$30
+!byte $8e,$16,$d0
+
+   jsr $fda3      ; initialize CIA
+   jsr $fd50      ; init and test RAM (RAM is not cleared)
+   jsr $fd15      ; reset input/output vectors
+   jsr $ff5b      ; CINT: Video-Reset
+   cli
+   jsr $e453      ; load Basic vectors
+   jsr $e3bf      ; init RAM for Basic
+   jsr $e422      ; display boot message
+   ldx #$fb       ; dec 251
+   txs            ; put on stack
+   ldx #$00
+
+fill_screen
+   lda screen_contents, x
+   beq +
+   jsr $ffd2      ; CHROUT
+   inx
+   bne fill_screen
+
++  lda #$0d       ; load RETURN key 
+   sta $0277      ; write into keyboard buffer (for LOAD command)
+   sta $0278      ; write into keyboard buffer (for RUN command)
+   lda #$02
+   sta $c6        ; set size of keyboard buffer
+   jmp $a474      ; enter Basic directmode
+
+
+; program ends here
+;-------------------
+; data starts here
+
+screen_contents
+  !byte $0D,$4C,$4F,$41,$44,$22,$42,$4F ;LOAD"BO
+  !byte $4F,$54,$36,$34,$22,$2C,$38,$0D ;OT64",8 <cr>
+  !byte $0D,$0D,$0D,$0D,$52,$55,$4E,$91 ;<cr><cr><cr><cr>RUN<up>
+  !byte $91,$91,$91,$91,$91,$91,$00     ;<up><up><up><up><up><up>
+
