@@ -1,11 +1,9 @@
 !to "128boot64.bin",cbm
 * = $8000
 
-   ora #$80
+!byte $09,$80,$5E,$FE,$C3,$C2,$CD,$38,$30
 
-!byte $5E,$FE,$C3,$C2,$CD,$38,$30
-!byte $8e,$16,$d0
-
+   stx $d016      ; 
    jsr $fda3      ; initialize CIA
    jsr $fd50      ; init and test RAM (RAM is not cleared)
    jsr $fd15      ; reset input/output vectors
