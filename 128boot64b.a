@@ -1,0 +1,81 @@
+!to "128boot64b.bin",cbm
+* = $8000
+
+z_from  = $fb
+z_to    = $fd
+
+    !byte <start,>start,$5E,$FE,$C3,$C2,$CD,$38,$30
+    
+start
+    stx $d016      ; 
+    jsr $fda3      ; initialize CIA
+    jsr $fd50      ; init and test RAM (RAM is not cleared)
+    jsr $fd15      ; reset input/output vectors
+    jsr $ff5b      ; CINT: Video-Reset
+    cli
+    jsr $e453      ; load Basic vectors
+    jsr $e3bf      ; init RAM for Basic
+    jsr $e422      ; display boot message
+    ldx #$fb       ; dec 251
+    txs            ; put on stack
+    
+    ldx #$00
+    
+fill_screen
+    lda screen_contents, x
+    beq +
+    jsr $ffd2      ; CHROUT
+    inx
+    bne fill_screen
+
+   
+;   fill ZP values
++   lda $1210
+    sta z_from
+    lda $1211
+    sta z_from+1
+    
+    lda #$01
+    sta z_to
+    lda #$08
+    sta z_to+1
+    
+;  copy from loaded location to $0801
+    ldy #0
+    ldx sizeh
+    beq +
+    
+-   lda (z_from),Y ; move a page at a time
+    sta (z_to),Y
+    iny
+    bne -
+    inc z_from+1
+    inc z_to+1
+    dex
+    bne -
+    
++   ldx sizel
+    beq +
+    
+-   lda (z_from),Y ; move the remaining bytes
+    sta (z_to),Y
+    iny
+    dex
+    bne -
+    
++   lda #$0d       ; load RETURN key 
+    sta $0277      ; write into keyboard buffer (for RUN command)
+    lda #$01
+    sta $c6        ; set size of keyboard buffer
+    jmp $a474      ; enter Basic directmode
+
+
+; program ends here
+;-------------------
+; data starts here
+
+screen_contents
+    !byte $0d,$52,$55,$4E,$91,$91,$00 ;<cr>RUN<up><up>
+
+sizel !byte 0
+sizeh !byte 0
