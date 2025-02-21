@@ -1,0 +1,14 @@
+﻿!to "go64bank1.bin",cbm
+* = $0400
+
+    lda #$7e
+    sta $ff00
+    
+    sei
+    lda #$40
+    sta $d506
+    
+    lda #$f7
+    sta $d505
+    
+    jmp ($fffc)

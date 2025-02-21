@@ -1,0 +1,61 @@
+﻿; this does just RUN.
+; supposed to be called when GO64 BANK1 was done before
+
+
+!to "128boot64g.bin",cbm
+* = $8000
+
+z_from  = $fb
+z_to    = $fd
+
+    !byte <start,>start,$5E,$FE,$C3,$C2,$CD,$38,$30
+    
+start
+    stx $d016      ; 
+    jsr $fda3      ; initialize CIA
+    jsr $fd50      ; init and test RAM (RAM is not cleared)
+    jsr $fd15      ; reset input/output vectors
+    jsr $ff5b      ; CINT: Video-Reset
+    cli
+    jsr $e453      ; load Basic vectors
+    jsr $e3bf      ; init RAM for Basic
+    jsr $e422      ; display boot message
+    ldx #$fb       ; dec 251
+    txs            ; put on stack
+    
+    ldy#$01
+    tya
+    sta ($2b),Y   ; Wert>0 in High-Byte der ersten Link-Adresse schreiben
+    jsr $a533
+    lda $22       ; Basic-Ende/Variablenstart = Adresse der letzten gefundenen '0' + 2
+    clc
+    adc #$02
+    sta $2d
+    lda $23
+    adc #$00
+    sta $2e
+    jsr $a660
+
+    ldx #$00
+    
+fill_screen
+    lda screen_contents, x
+    beq +
+    jsr $ffd2      ; CHROUT
+    inx
+    bne fill_screen
+
++   lda #$0d       ; load RETURN key 
+    sta $0277      ; write into keyboard buffer (for RUN command)
+    lda #$01
+    sta $c6        ; set size of keyboard buffer
+    jmp $a474      ; enter Basic directmode
+
+
+; program ends here
+;-------------------
+; data starts here
+
+screen_contents
+    !byte $0d,$52,$55,$4E,$91,$91,$00 ;<cr>RUN<up><up>
+
