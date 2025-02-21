@@ -1,4 +1,4 @@
-!to "128boot64.bin",cbm
+﻿!to "cartload.bin",cbm
 * = $8000
 
 !byte $09,$80,$5E,$FE,$C3,$C2,$CD,$38,$30
