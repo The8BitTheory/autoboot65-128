@@ -1,0 +1,118 @@
+; this utility does a soft-reset into go64 mode.
+; before doing that, it stores relevant values in safe locations.
+; any basic program that's loaded before calling this will be run automatically in go64 mode.
+
+; this code was created by MacBacon as part of the Loader for DigitalTalk disk-magazine.
+; https://digitaltalk.at/
+
+; extracted by Goodwell to a dedicated binary that's suitable for being used flexibly.
+; presented on youtube.com/@the8bittheory/...
+
+; the explanation of the filename of the binary is "GO 64 to Bank 1 with Soft-Reset, start-address $3fb"
+
+; USAGE:
+; F$ contains the C64 Basic program filename to be loaded (can just be a basic loader for a ML program)
+;10 BLOAD (F$),B1,U(DU)
+;20 BLOAD"GO64B1SOFT.3FB",U(DU),B1
+;30 BANK 1
+;40 SYS DEC("3FB")
+
+
+
+!to "go64b1soft.3fb.prg",cbm
+* = $03fb
+
+    z_load_end_128  = $ae
+    z_device        = $ba
+    vic_clock       = $d030
+
+    lda #$7e
+    sta $ff00
+    
+    ; store data that's about to be deleted upon reset
+    lda z_load_end_128  ; remember end address plus one
+    ldx z_load_end_128 + 1
+    sta load_end_low_buf
+    stx load_end_high_buf
+    lda z_device    ; remember current unit number
+    sta current_unit_buf
+    lda $0801   ; remember first two BASIC bytes
+    ldx $0802   ; because reset will clear them
+    sta basic1_buf
+    stx basic2_buf
+    lda $a000   ; remember $a000 because reset clears it
+    sta a000_buf
+    
+    sei
+    lda #$40
+    sta $d506
+    
+    lda #$f7
+    sta $d505
+    
+    ; fake reset
+    ldx #$ff
+    txs
+    cld
+    stx $d016
+    jsr $fda3
+    jsr $fd50
+    jsr $fd15
+
+part3_target = $0334
+
+    ldx #part3_end - part3_start
+-     lda part3_start - 1, x
+      sta part3_target - 1, x
+      dex
+      bne -
+    jmp part3_target  ; call part 3
+    
+part3_start
+; go on with reset routine
+    jsr $ff5b ; init screen (would overwrite this code if not relocated)
+    cli
+    
+; init BASIC
+    jsr $e453
+    jsr $e3bf ; init RAM
+    jsr $e422 ; show message
+    
+    ; restore memory location $a000
+a000_buf = * + 1
+    lda #$ff  ; modified!
+    sta $a000
+    
+    ; restore first bytes of basic program
+basic1_buf = * + 1
+    lda #$ff  ; modified!
+basic2_buf = * + 1
+    ldx #$ff  ; modified!
+    sta $0801
+    stx $0802
+    
+    ; restore current unit number
+current_unit_buf = * + 1
+    lda #$ff  ; modified!
+    sta $ba
+    
+    ; restore end address of program
+load_end_low_buf = * + 1
+    lda #$ff  ; modified!
+load_end_high_buf = * + 1
+    ldx #$ff  ; modified!
+    sta $ae ; end of basic program in c64
+    stx $af
+    sta $2d ; start of variables in c64
+    stx $2e
+    
+    ; now fake CLR and RUN
+    jsr $a660 ; call CLR to make sure pointers are correct
+    
+    ; enter SLOW mode
+    lda #0
+    sta vic_clock
+    
+    jmp $a7ae ; call BASIC interpreter
+part3_end
+
