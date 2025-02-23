@@ -2,7 +2,7 @@
 ; before doing that, it stores relevant values in safe locations.
 ; any basic program that's loaded before calling this will be run automatically in go64 mode.
 
-; this code was created by MacBacon as part of the Loader for DigitalTalk disk-magazine.
+; this code was created by Marco Baye (aka Mac Bacon) as part of the Loader for DigitalTalk disk-magazine.
 ; https://digitaltalk.at/
 
 ; extracted by Goodwell to a dedicated binary that's suitable for being used flexibly.
@@ -76,6 +76,10 @@ part3_start
 ; init BASIC
     jsr $e453
     jsr $e3bf ; init RAM
+    lda #0
+    sta $d020
+    sta $d021
+    sta $0286
     jsr $e422 ; show message
     
     ; restore memory location $a000
