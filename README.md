@@ -3,7 +3,7 @@
 The folders in this project contain the following programs:
 
 ## 128-load
-Based on the 128BOOT64 program from the October 1986 issue of Computer Gazette.
+Based on the 128BOOT64 program from the October 1986 issue of Computer Gazette. https://www.atarimagazines.com/compute/issue77/Boot_64_For_128.php
 
 This generates pseudo cartridge-code at $8000 and then hands over control to the C64 mode via GO64.
 
