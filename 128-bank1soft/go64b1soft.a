@@ -12,8 +12,8 @@
 
 ; USAGE:
 ; F$ contains the C64 Basic program filename to be loaded (can just be a basic loader for a ML program)
-;10 BLOAD (F$),B1,U(DU)
-;20 BLOAD"GO64B1SOFT.3FB",U(DU),B1
+;10 BLOAD"GO64B1SOFT.3FB",U(DU),B1
+;20 BLOAD (F$),B1,U(DU)
 ;30 BANK 1
 ;40 SYS DEC("3FB")
 
