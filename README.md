@@ -1,6 +1,6 @@
 # Autoboot on C128 and MEGA65
 
-This is the supplementary repository to this video: https://youtu.be/eGZNVrObzlE?si=2Zqt6C2U6px933hd
+This is the supplementary repository to this video: [C128 and MEGA65 Autoboot can fastload your C64-Games.](https://youtu.be/eGZNVrObzlE?si=2Zqt6C2U6px933hd) 
 
 The folders in this project contain the following programs:
 
